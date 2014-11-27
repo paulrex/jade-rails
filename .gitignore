@@ -1,0 +1,6 @@
+*.gem
+*.lock
+.bundle
+.ruby-version
+pkg/
+tmp/
