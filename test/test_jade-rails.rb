@@ -16,4 +16,13 @@ class JadeTest < Test::Unit::TestCase
     assert_equal Jade.compile('string of jade'), Jade.compile(io)
   end
 
+  def test_compilation_error
+    assert_raise ExecJS::ProgramError do
+      Jade.compile <<-JADE
+        else
+          .foo
+      JADE
+    end
+  end
+
 end
