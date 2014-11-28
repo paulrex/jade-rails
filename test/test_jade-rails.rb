@@ -11,4 +11,9 @@ class JadeTest < Test::Unit::TestCase
     assert_no_match(/^\s*<!DOCTYPE html>/, result)
   end
 
+  def test_compile_with_io
+    io = StringIO.new('string of jade')
+    assert_equal Jade.compile('string of jade'), Jade.compile(io)
+  end
+
 end

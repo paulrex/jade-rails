@@ -13,6 +13,7 @@ module Jade
         #{jade_js}
         var jade = window.jade;
       JS
+      source = source.read if source.respond_to?(:read)
       context.eval("jade.compileClient(#{source.to_json}, #{options.to_json})")
     end
 
