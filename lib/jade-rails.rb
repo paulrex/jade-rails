@@ -21,3 +21,5 @@ module Jade
 
   end
 end
+
+require 'jade/railtie' if defined?(Rails)
