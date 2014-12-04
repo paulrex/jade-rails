@@ -14,6 +14,19 @@ module Jade
     def prepare
     end
 
+    # Compile template data using Jade compiler.
+    #
+    # This returns a String containing a JS function, which is intended
+    # to be used with the Sprockets JST engine. Name your file so that
+    # it is processed by both of these engines, and then the template
+    # will be available on the JST global on the front end.
+    #
+    # For example, `my_template.jst.jade` will be available on the front
+    # end as JST['my_template'], which is a function that takes a single
+    # argument containing the locals to use in rendering the template:
+    #
+    #   # => function template(locals) { ... }
+    #
     def evaluate(context, locals, &block)
       options = { }
       # options[:filename] = eval_file
