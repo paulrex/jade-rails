@@ -1,6 +1,10 @@
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require 'jade/version'
+
 Gem::Specification.new do |spec|
   spec.name          = 'jade-rails'
-  spec.version       = '1.8.0.0'
+  spec.version       = Jade::VERSION
   spec.author        = 'Paul Raythattha'
   spec.email         = 'paul@appfactories.com'
   spec.summary       = %q{Jade adapter for the Rails asset pipeline.}
