@@ -100,3 +100,7 @@ The `jade-rails` gem version always reflects the version of Jade it contains,
 with an additional number for gem-specific changes.
 
 Always check [the Jade change log](http://jade-lang.com/history/) when upgrading.
+
+## Code Status
+
+[![Gem Version](https://badge.fury.io/rb/jade-rails.svg)](http://badge.fury.io/rb/jade-rails)
