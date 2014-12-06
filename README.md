@@ -10,3 +10,10 @@ Add to your Gemfile:
 ```ruby
 gem 'jade-rails', '~> 1.8.0.0'
 ```
+
+In your `application.js`, require the Jade runtime before any files that include
+Jade templates.
+
+```
+//= require jade/runtime
+```
