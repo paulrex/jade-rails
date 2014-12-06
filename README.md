@@ -3,6 +3,9 @@
 This gem provides integration for Ruby on Rails projects with the [Jade
 templating language](http://jade-lang.com/).
 
+Combined with the JST engine built in to Sprockets, you can use this gem
+to render Jade templates anywhere on the front end of your Rails app.
+
 ## Installing
 
 Add to your Gemfile:
