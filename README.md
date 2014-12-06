@@ -46,3 +46,30 @@ because only some of them make sense for client-side compilation within Rails.
 
 See [the official Jade documentation](http://jade-lang.com/api/) for more
 details about these options.
+
+## Example
+
+In `config/application.rb`:
+
+```ruby
+AmazingProject::Application.configure do
+  config.jade.pretty = true
+  config.jade.compile_debug = true
+  config.jade.globals = ['helpers']
+end
+```
+
+In `app/assets/javascripts/templates/amazing_template.jst.jade`:
+
+```jade
+h1 Jade: A Template Engine
+p.lead.
+  Jade is a terse and simple templating language with a strong focus on
+  performance and powerful features.
+```
+
+Then you can render this template anywhere in your JS code:
+
+```javascript
+JST['templates/amazing_template']()
+```
