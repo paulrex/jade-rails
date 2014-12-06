@@ -29,7 +29,7 @@ module Jade
     #
     def evaluate(context, locals, &block)
       options = { }
-      # options[:filename] = eval_file
+      options[:filename] = eval_file
 
       jade_config = context.environment.context_class.jade_config.merge(options)
       # Manually camelize the one option key that needs to be camelized.
