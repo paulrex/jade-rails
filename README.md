@@ -89,3 +89,10 @@ for unescaped buffered code. For example, to "include" another template named
 ```bash
 bundle exec rake test
 ```
+
+## Versioning
+
+The `jade-rails` gem version always reflects the version of Jade it contains,
+with an additional number for gem-specific changes.
+
+Always check [the Jade change log](http://jade-lang.com/history/) when upgrading.
