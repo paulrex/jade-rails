@@ -44,6 +44,10 @@ because only some of them make sense for client-side compilation within Rails.
 - `globals`: This is an array of globals (as strings) that will be made
   available in the local scope of compiled templates. It defaults to `[]`.
 
+In addition, the `filename` of the template being compiled is always passed in
+to the Jade compiler options. If `compile_debug` is set to `true`, the filename
+will be shown as part of the error output.
+
 See [the official Jade documentation](http://jade-lang.com/api/) for more
 details about these options.
 
