@@ -83,3 +83,9 @@ for unescaped buffered code. For example, to "include" another template named
 ```jade
 != JST['includes/header']()
 ```
+
+## Running Tests
+
+```bash
+bundle exec rake test
+```
