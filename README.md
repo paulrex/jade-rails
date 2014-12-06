@@ -73,3 +73,13 @@ Then you can render this template anywhere in your JS code:
 ```javascript
 JST['templates/amazing_template']()
 ```
+
+## Notes
+
+Includes are not supported. Instead, use JST along with Jade's functionality
+for unescaped buffered code. For example, to "include" another template named
+`includes/header.jst.jade` which renders with no locals, write:
+
+```jade
+!= JST['includes/header']()
+```
