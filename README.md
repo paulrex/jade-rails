@@ -11,7 +11,7 @@ to render Jade templates anywhere on the front end of your Rails app.
 Add to your Gemfile:
 
 ```ruby
-gem 'jade-rails', '~> 1.8.2.0'
+gem 'jade-rails', '~> 1.9.1.0'
 ```
 
 In your `application.js`, require the Jade runtime before any files that include
