@@ -1,3 +1,3 @@
 module Jade
-  VERSION = '1.10.0.0'
+  VERSION = '1.11.0.0'
 end
