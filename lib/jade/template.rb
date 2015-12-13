@@ -31,7 +31,14 @@ module Jade
       options = { }
       options[:filename] = eval_file
 
-      jade_config = context.environment.context_class.jade_config.merge(options)
+      # For Rails 4.0.x and 4.1.x, the app-level config is on context.environment.
+      # For Rails 4.2.x, it's on context.assets instead.
+      app_level_config = context.environment.context_class.jade_config
+      if app_level_config.nil?
+        app_level_config = context.assets.context_class.jade_config
+      end
+      jade_config = app_level_config.merge(options)
+
       # Manually camelize the one option key that needs to be camelized.
       jade_config[:compileDebug] = jade_config.delete(:compile_debug) { false }
 
