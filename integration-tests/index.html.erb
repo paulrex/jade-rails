@@ -1,0 +1,7 @@
+<div id="test-container">
+</div>
+
+<%= javascript_tag do -%>
+  var testElement = document.getElementById("test-container");
+  testElement.innerHTML = JST['amazing_template']();
+<% end -%>
