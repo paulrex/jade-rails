@@ -1,0 +1,5 @@
+# frozen_string_literal: true
+source 'https://rubygems.org'
+
+# This line will be overwritten by the integration-testing script as needed.
+# gem 'rails', 'X.Y.Z'
