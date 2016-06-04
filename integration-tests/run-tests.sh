@@ -82,11 +82,11 @@ for rails_version in ${rails_versions[@]}; do
 
   # Now set up a simple Jade template, along with the controller, view, and route to render it.
   # These files look exactly the same regardless of Rails version or app name.
-  cp ../amazing_template.jst.jade ./app/assets/javascripts/
-  cp ../test_controller.rb ./app/controllers/
+  cp ../fixtures/amazing_template.jst.jade ./app/assets/javascripts/
+  cp ../fixtures/test_controller.rb ./app/controllers/
   mkdir ./app/views/test
-  cp ../index.html.erb ./app/views/test/
-  cp ../routes.rb ./config/routes.rb
+  cp ../fixtures/index.html.erb ./app/views/test/
+  cp ../fixtures/routes.rb ./config/routes.rb
 
   # Production Environment Test
   # Simply ensure that asset precompilation succeeds.
