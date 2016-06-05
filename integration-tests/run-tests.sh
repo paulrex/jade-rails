@@ -46,7 +46,7 @@ for rails_version in ${rails_versions[@]}; do
   sed -i '' "5 s/.*/gem 'rails', '${rails_version}'/" ./Gemfile
   bundle install
   rbenv rehash
-  installed_rails_version=$(rails -v)
+  installed_rails_version=$(bundle exec rails -v)
   if [[ $installed_rails_version != "Rails ${rails_version}" ]]
   then
     echo
@@ -58,7 +58,7 @@ for rails_version in ${rails_versions[@]}; do
 
   # Instantiate a new Rails app using that version.
   app_name="test-${rails_version}"
-  rails new ${app_name}
+  bundle exec rails new ${app_name}
 
   # Inside this Rails app, set up the jade-rails gem.
   # (1) Add it to the Gemfile.
