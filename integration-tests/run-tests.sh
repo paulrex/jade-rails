@@ -97,11 +97,14 @@ for rails_version in ${rails_versions[@]}; do
   # Start up a server, request the compiled asset for the Jade template, and check its contents.
   bundle exec rails s -p ${dev_server_port} > /dev/null 2>&1 &
   sleep 5 # give the dev server time to boot
-  compiled_template=$(curl localhost:${dev_server_port}/assets/amazing_template.js)
+  compiled_template=$(curl localhost:${dev_server_port}/assets/application.js)
   echo
   echo $compiled_template
   echo
-  if [[ $compiled_template != *"jade_debug.shift()"* ]]
+  # if [[ $compiled_template != *"jade_debug.shift()"* ]]
+  # TODO: This is now checking for a string that's present whether or not compileDebug is on.
+  # Really, the integration test needs to toggle the option in the app config and confirm that it works both ways.
+  if [[ $compiled_template != *"buf.push(\"<h1>"* ]]
   then
     echo
     echo "ERROR"
