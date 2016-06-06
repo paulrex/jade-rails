@@ -20,16 +20,21 @@
 set -e
 set -o pipefail
 
+# This is a utility function to fail-fast if an assertion fails.
+# It takes 1 argument which is the text of the error itself.
+raise () {
+  echo
+  echo "ERROR"
+  echo $1
+  echo
+  exit 1
+}
+
 # To simplify all the other references to files and paths, force this script to only run from inside
 # the integration-tests directory itself.
 current_directory=$(pwd)
-if [[ $current_directory != *"integration-tests" ]]
-then
-  echo
-  echo "ERROR"
-  echo "This script must be run from inside the integration-tests directory."
-  echo
-  exit 1
+if [[ $current_directory != *"integration-tests" ]]; then
+  raise "This script must be run from inside the integration-tests directory."
 fi
 
 # Test against the currently-supported Rails versions.
@@ -47,13 +52,8 @@ for rails_version in ${rails_versions[@]}; do
   bundle install
   rbenv rehash
   installed_rails_version=$(bundle exec rails -v)
-  if [[ $installed_rails_version != "Rails ${rails_version}" ]]
-  then
-    echo
-    echo "ERROR"
-    echo "Failed to correctly install Rails version ${rails_version}."
-    echo
-    exit 1
+  if [[ $installed_rails_version != "Rails ${rails_version}" ]]; then
+    raise "Failed to correctly install Rails version ${rails_version}."
   fi
 
   # Instantiate a new Rails app using that version.
@@ -72,13 +72,6 @@ for rails_version in ${rails_versions[@]}; do
   sed -i '' "/require_tree/ i\\
     //= require jade/runtime
     " ./app/assets/javascripts/application.js
-  # (4) Add gem configuration into the Rails app config.
-  sed -i '' "/class Application/ a\\
-    config.jade.pretty = true
-    " ./config/application.rb
-  sed -i '' "/pretty/ a\\
-    config.jade.compile_debug = true
-    " ./config/application.rb
 
   # Now set up a simple Jade template, along with the controller, view, and route to render it.
   # These files look exactly the same regardless of Rails version or app name.
@@ -88,32 +81,67 @@ for rails_version in ${rails_versions[@]}; do
   cp ../fixtures/index.html.erb ./app/views/test/
   cp ../fixtures/routes.rb ./config/routes.rb
 
-  # Production Environment Test
-  # Simply ensure that asset precompilation succeeds.
-  RAILS_ENV=production bundle exec rake assets:precompile
-  # TODO: Also assert on the contents of the compiled application.js.
+  # Now that we have a barebones Rails app set up with the gem and a Jade
+  # template, we test to ensure the template compiles and renders properly, in
+  # both dev and production. We also want to test the ability to set the
+  # config.jade flags in the app code. So, specifically, the test plan is:
+  #
+  # 1. Test production assets.
+  #     - Compile assets for production.
+  #     - Confirm that the compiled application.js contains a Jade template ready to use.
+  #     - Confirm that the compiled application.js does not have Jade code
+  #       compiled with compileDebug (because this should be disabled by the
+  #       default configuration for this gem). See lib/jade/rails/engine.rb.
+  # 2. Test development assets.
+  #     - Start a Rails dev server and request the application.js compiled on the fly for dev.
+  #     - Confirm that the application.js served in development has the Jade template ready to use.
+  #     - Confirm that the template was compiled with compileDebug turned on.
+  # 3. Test app-level configuration.
+  #     - Set config.jade.compile_debug to true in config/environments/production.rb.
+  #     - Recompile assets for production.
+  #     - Confirm that the compiled application.js has debugging code inside the Jade template.
+  #
+  # (Note that, by default, our test code also requires all commands to execute
+  # successfully, because of the settings at the top of this script.)
 
-  # Development Environment Test
+  # These are the strings we'll check for to indicate whether or not
+  # compileDebug was used when compiling the Jade template.
+  compile_debug_off_string="this.JST.amazing_template=function(){var e=[];return e.push('<h1>Jade: A Template Engine</h1>"
+  compile_debug_on_string="unshift(new jade.DebugItem("
+
+  # 1. Test production assets.
+  RAILS_ENV=production bundle exec rake assets:precompile
+  production_compiled_js=$(cat public/assets/application-*.js)
+  if [[ $production_compiled_js != *"$compile_debug_off_string"* ]]; then
+    raise "Precompiled application.js did not have expected production-ready Jade template code."
+  fi
+  if [[ $production_compiled_js == *"$compile_debug_on_string"* ]]; then
+    raise "Precompiled application.js contained debugging code inside Jade template."
+  fi
+
+  # 2. Test development assets.
   # Start up a server, request the compiled asset for the Jade template, and check its contents.
-  bundle exec rails s -p ${dev_server_port} > /dev/null 2>&1 &
-  sleep 5 # give the dev server time to boot
-  compiled_template=$(curl localhost:${dev_server_port}/assets/application.js)
-  echo
-  echo $compiled_template
-  echo
-  # if [[ $compiled_template != *"jade_debug.shift()"* ]]
-  # TODO: This is now checking for a string that's present whether or not compileDebug is on.
-  # Really, the integration test needs to toggle the option in the app config and confirm that it works both ways.
-  if [[ $compiled_template != *"buf.push(\"<h1>"* ]]
-  then
-    echo
-    echo "ERROR"
-    echo "Compiled Jade template did not contain expected string 'jade_debug.shift()'."
-    echo
-    exit 1
+  # bundle exec rails s -p ${dev_server_port} > /dev/null 2>&1 &
+  bundle exec rails s -p ${dev_server_port} &
+  sleep 5 # Give the dev server time to boot.
+  dev_compiled_js=$(curl localhost:${dev_server_port}/assets/application.js)
+  if [[ $dev_compiled_js != *"$compile_debug_on_string"* ]]; then
+    raise "Development application.js did not contain debugging code inside Jade template."
   fi
   # Clean up the backgrounded dev server.
   kill %%
+
+  # 3. Test app-level configuration.
+  sed -i '' "/Rails.application.configure do/ a\\
+    config.jade.compile_debug = true
+    " ./config/environments/production.rb
+  rm -r tmp/
+  rm -r public/assets
+  RAILS_ENV=production bundle exec rake assets:precompile
+  production_compiled_js=$(cat public/assets/application-*.js)
+  if [[ $production_compiled_js != *"$compile_debug_on_string"* ]]; then
+    raise "Precompiled application.js with compileDebug true did not contain debugging code inside Jade template."
+  fi
 
   # Clean out the instantiated Rails app.
   cd ..
