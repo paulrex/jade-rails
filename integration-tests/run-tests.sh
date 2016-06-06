@@ -20,16 +20,21 @@
 set -e
 set -o pipefail
 
+# This is a utility function to fail-fast if an assertion fails.
+# It takes 1 argument which is the text of the error itself.
+raise () {
+  echo
+  echo "ERROR"
+  echo $1
+  echo
+  exit 1
+}
+
 # To simplify all the other references to files and paths, force this script to only run from inside
 # the integration-tests directory itself.
 current_directory=$(pwd)
-if [[ $current_directory != *"integration-tests" ]]
-then
-  echo
-  echo "ERROR"
-  echo "This script must be run from inside the integration-tests directory."
-  echo
-  exit 1
+if [[ $current_directory != *"integration-tests" ]]; then
+  raise "This script must be run from inside the integration-tests directory."
 fi
 
 # Test against the currently-supported Rails versions.
@@ -47,13 +52,8 @@ for rails_version in ${rails_versions[@]}; do
   bundle install
   rbenv rehash
   installed_rails_version=$(bundle exec rails -v)
-  if [[ $installed_rails_version != "Rails ${rails_version}" ]]
-  then
-    echo
-    echo "ERROR"
-    echo "Failed to correctly install Rails version ${rails_version}."
-    echo
-    exit 1
+  if [[ $installed_rails_version != "Rails ${rails_version}" ]]; then
+    raise "Failed to correctly install Rails version ${rails_version}."
   fi
 
   # Instantiate a new Rails app using that version.
@@ -104,13 +104,8 @@ for rails_version in ${rails_versions[@]}; do
   # if [[ $compiled_template != *"jade_debug.shift()"* ]]
   # TODO: This is now checking for a string that's present whether or not compileDebug is on.
   # Really, the integration test needs to toggle the option in the app config and confirm that it works both ways.
-  if [[ $compiled_template != *"buf.push(\"<h1>"* ]]
-  then
-    echo
-    echo "ERROR"
-    echo "Compiled Jade template did not contain expected string 'jade_debug.shift()'."
-    echo
-    exit 1
+  if [[ $compiled_template != *"buf.push(\"<h1>"* ]]; then
+    raise "Compiled Jade template did not contain expected string 'jade_debug.shift()'."
   fi
   # Clean up the backgrounded dev server.
   kill %%
