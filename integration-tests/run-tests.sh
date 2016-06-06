@@ -107,7 +107,7 @@ for rails_version in ${rails_versions[@]}; do
   # These are the strings we'll check for to indicate whether or not
   # compileDebug was used when compiling the Jade template.
   compile_debug_off_string="this.JST.amazing_template=function(){var e=[];return e.push('<h1>Jade: A Template Engine</h1>"
-  compile_debug_on_string="jade_debug.shift()"
+  compile_debug_on_string="unshift(new jade.DebugItem("
 
   # 1. Test production assets.
   RAILS_ENV=production bundle exec rake assets:precompile
@@ -132,7 +132,16 @@ for rails_version in ${rails_versions[@]}; do
   kill %%
 
   # 3. Test app-level configuration.
-  # TODO
+  sed -i '' "/Rails.application.configure do/ a\\
+    config.jade.compile_debug = true
+    " ./config/environments/production.rb
+  rm -r tmp/
+  rm -r public/assets
+  RAILS_ENV=production bundle exec rake assets:precompile
+  production_compiled_js=$(cat public/assets/application-*.js)
+  if [[ $production_compiled_js != *"$compile_debug_on_string"* ]]; then
+    raise "Precompiled application.js with compileDebug true did not contain debugging code inside Jade template."
+  fi
 
   # Clean out the instantiated Rails app.
   cd ..
