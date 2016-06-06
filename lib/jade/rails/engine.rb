@@ -4,6 +4,12 @@ module Jade
 
       config.jade = ActiveSupport::OrderedOptions.new
 
+      # Set default values. See README for details.
+      config.jade.pretty        = ::Rails.env.development?
+      config.jade.self          = false
+      config.jade.compile_debug = ::Rails.env.development?
+      config.jade.globals       = []
+
       initializer 'jade.assets.register', :group => :all do |app|
         config.assets.configure do |env|
           env.register_mime_type   'text/x-jade-template', :extensions => ['.jade']

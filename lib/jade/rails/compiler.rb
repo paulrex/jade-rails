@@ -11,7 +11,12 @@ module Jade
           JS
         end
 
-        # TODO: Get options from config.jade.
+        # Get the compilation options from the application's config.jade.
+        # See lib/jade/rails/engine.rb for details.
+        options = ::Rails.application.config.jade.merge(options)
+        # For one of the options keys, we need to manually camel-case before
+        # passing to the Jade compiler.
+        options[:compileDebug] = options.delete(:compile_debug) { false }
 
         source = source.read if source.respond_to?(:read)
         compiled = @@context.eval("jade.compileClient(#{source.to_json}, #{options.to_json})")
