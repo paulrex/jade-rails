@@ -12,7 +12,7 @@ module Jade
 
       initializer 'jade.assets.register', :group => :all do |app|
         config.assets.configure do |env|
-          env.register_mime_type   'text/x-jade-template', :extensions => ['.jade']
+          env.register_mime_type   'text/x-jade-template', :extensions => ['.jade', '.jst.jade']
           if env.respond_to?(:register_transformer)
             # Sprockets 3 introduces the idea of "transformers," which is
             # exactly what we want here.  Note that this transformer class

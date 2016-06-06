@@ -11,16 +11,15 @@ module Jade
         self.class.run(@filename, @source)
       end
 
-      def self.run(filename, source)
-        options  = { :filename => filename }
-        compiled = Compiler.compile(source, options)
-        return { :data => compiled }
-      end
-
       def self.call(input)
-        filename = input[:filename]
+        # Compile the Jade template into a JS template function.
         source   = input[:data]
-        self.run(filename, source)
+        filename = input[:filename]
+        compiled = Compiler.compile(source, { :filename => filename })
+
+        # Then use the JST processor to add the template to the window.JST object.
+        input[:data] = compiled
+        return ::Sprockets::JstProcessor.call(input)
       end
 
     end
